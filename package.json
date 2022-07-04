@@ -1,0 +1,20 @@
+{
+  "name": "flowtest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.18.2",
+    "@babel/preset-env": "^7.18.2",
+    "babel-jest": "^28.1.1",
+    "flow-js-testing": "^0.2.3-alpha.6",
+    "jest": "^28.1.1",
+    "jest-environment-node": "^28.1.1"
+  }
+}
