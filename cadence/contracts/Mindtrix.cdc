@@ -290,8 +290,8 @@ pub contract Mindtrix: NonFungibleToken {
                     let second = Mindtrix.SerialGenus(tier: 2, number: self.secondSerial, name: "nftEnum", description: "e.g. the Audio, Image, or Quest in a Podcast Show")
                     let third = Mindtrix.SerialGenus(tier: 3, number: self.thirdSerial, name: "nftFirstSet", description: "e.g. the 2nd podcast show of a creator")
                     let fourth = Mindtrix.SerialGenus(tier: 4, number: self.fourthSerial, name: "nftSecondSet", description: "e.g. the 18th episode of a podcast show")
-                    let fifth = Mindtrix.SerialGenus(tier: 5, number: self.fifthSerial, name: "nftThirdSet", description: "e.g. the 10th segment of an episode")
-                    let sixth = Mindtrix.SerialGenus(tier: 6, number: self.editionNumber, name: "nftEdtionNumber", description: "e.g. the 100th edition of a segment")
+                    let fifth = Mindtrix.SerialGenus(tier: 5, number: self.fifthSerial, name: "nftThirdSet", description: "e.g. the 10th essence of an episode")
+                    let sixth = Mindtrix.SerialGenus(tier: 6, number: self.editionNumber, name: "nftEdtionNumber", description: "e.g. the 100th edition of a essence")
                     let genusList: [Mindtrix.SerialGenus] = [first, second, third, fourth, fifth, sixth]
                     return genusList
                 case Type<Mindtrix.AudioEssence>():
