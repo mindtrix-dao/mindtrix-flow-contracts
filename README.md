@@ -4,7 +4,7 @@ A community derives from podcasters, listeners, and collectors.
 We're building a one-stop minting tool to bring the podcast ecosystem into the web3 world!
 
 ## Live Project
-A podcast RSS feed link and an invite code is prerequisite. Please contact us to have a demo if you are a podcaster.
+A podcast RSS feed link and an invite code is prerequisite. Please contact us to have a demo if you are a podcaster.  
 https://alpha-app.mindtrix.xyz/ready
 
 
