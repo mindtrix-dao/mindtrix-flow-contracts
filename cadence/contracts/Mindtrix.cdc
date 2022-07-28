@@ -1,9 +1,8 @@
 /*
 
 ============================================================
-Name: Smart Contract for Mindtrix
+Name: NFT Contract for Mindtrix
 Author: AS
-Version: 0.1.0
 ============================================================
 
 Mindtrix is a decentralized podcast community on Flow.
@@ -119,7 +118,7 @@ pub contract Mindtrix: NonFungibleToken {
         }
     }
 
-    // AudioEssence struct is optional and only exists when an NFT is a VoiceSerial.essence.
+    // AudioEssence struct is optional and only exists when an NFT is a VoiceSerial.audio.
     pub struct AudioEssence  {
         // e.g. startTime = 96 = 00:01:36
         pub let startTime: UInt16?
@@ -140,6 +139,25 @@ pub contract Mindtrix: NonFungibleToken {
 
         init(str: String) {
             self.str = str
+        }
+    }
+
+    pub struct Display {
+        pub let name: String
+        pub let description: String
+        pub let thumbnail: AnyStruct{MetadataViews.File}
+        pub let createdDateTime: UFix64
+
+        init(
+            name: String,
+            description: String,
+            thumbnail: AnyStruct{MetadataViews.File},
+            createdDateTime: UFix64
+        ) {
+            self.name = name
+            self.description = description
+            self.thumbnail = thumbnail
+            self.createdDateTime = createdDateTime
         }
     }
 
@@ -175,6 +193,8 @@ pub contract Mindtrix: NonFungibleToken {
         pub let editionQuantity: UInt64
 
         pub let licenseIdentifier: String
+        pub let createdDateTime: UFix64
+
 
         init(
             id: UInt64,
@@ -222,6 +242,7 @@ pub contract Mindtrix: NonFungibleToken {
             self.editionNumber = editionNumber
             self.editionQuantity = editionQuantity
             self.extraMetadata = extraMetadata
+            self.createdDateTime = getCurrentBlock().timestamp
         }
 
         pub fun updateMetadata(newExtraMetadata: {String: AnyStruct}) {
@@ -240,11 +261,13 @@ pub contract Mindtrix: NonFungibleToken {
             return [
                 Type<MetadataViews.Display>(),
                 Type<MetadataViews.Serial>(),
+                Type<MetadataViews.ExternalURL>(),
                 Type<MetadataViews.Editions>(),
                 Type<MetadataViews.Royalties>(),
                 Type<MetadataViews.License>(),
                 Type<MetadataViews.NFTCollectionData>(),
                 Type<MetadataViews.NFTCollectionDisplay>(),
+                Type<Mindtrix.Display>(),
                 Type<Mindtrix.SerialString>(),
                 Type<Mindtrix.SerialGenuses>(),
                 Type<Mindtrix.AudioEssence>()
@@ -273,6 +296,18 @@ pub contract Mindtrix: NonFungibleToken {
                             url: self.thumbnail
                         )
                     )
+                case Type<Mindtrix.Display>():
+                    return Mindtrix.Display(
+                        name: self.name,
+                        description: self.description,
+                        thumbnail: MetadataViews.HTTPFile(
+                            url: self.thumbnail
+                        ),
+                        createdDateTime: self.createdDateTime
+                    )
+                case Type<MetadataViews.ExternalURL>():
+                    // the URL will be replaced with a gallery link in the future.
+                    return MetadataViews.ExternalURL(self.collectionExternalURL)
                 case Type<MetadataViews.Editions>():
                     // There is no max number of NFTs that can be minted from this contract
                     // so the max edition field value is set to nil
@@ -449,7 +484,8 @@ pub contract Mindtrix: NonFungibleToken {
             editionQuantity: UInt64,
             extraMetadata: {String: AnyStruct}
         ) {
-
+            log("id:")
+            log(Mindtrix.totalSupply)
             // create a new NFT
             var newNFT <- create NFT(
                 id: Mindtrix.totalSupply,
