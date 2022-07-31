@@ -25,13 +25,16 @@ transaction(
     fourthSerial: UInt32,
     fifthSerial: UInt16,
     editionQuantity: UInt64,
-    extraMetadata: {String: AnyStruct}
+    audioEssence: [UFix64],
+    metadata: {String: AnyStruct}
 ) {
 
     // local variable for storing the minter reference
     let minter: &Mindtrix.NFTMinter
 
     let royalties: [MetadataViews.Royalty]
+
+    let audioEssence: Mindtrix.AudioEssence
 
     let royaltyReceiverPublicPath: PublicPath
 
@@ -61,6 +64,16 @@ transaction(
             )
           )
         }
+
+        let startTime = audioEssence[0] as? UFix64
+        let endTime = audioEssence[1] as? UFix64
+        let fullEpisodeDuration = audioEssence[2] as? UFix64
+
+        self.audioEssence = Mindtrix.AudioEssence(
+            startTime: startTime,
+            endTime: endTime,
+            fullEpisodeDuration: fullEpisodeDuration,
+        )
     }
 
     execute {
@@ -94,7 +107,8 @@ transaction(
             fourthSerial: fourthSerial,
             fifthSerial: fifthSerial,
             editionQuantity: editionQuantity,
-            extraMetadata: extraMetadata
+            audioEssence: self.audioEssence,
+            metadata: metadata
         )
     }
 }

@@ -25,13 +25,15 @@ transaction(
     fourthSerial: UInt32,
     fifthSerial: [UInt16],
     editionQuantity: [UInt64],
-    extraMetadata: [{String: AnyStruct}]
+    audioEssenceDictionary: {String: [UFix64]},
+    metadata: [{String: AnyStruct}]
 ) {
-
     // local variable for storing the minter reference
     let minter: &Mindtrix.NFTMinter
 
     let royalties: [MetadataViews.Royalty]
+
+    let audioEssences: [Mindtrix.AudioEssence]
 
     let royaltyReceiverPublicPath: PublicPath
 
@@ -42,6 +44,7 @@ transaction(
             ?? panic("Could not borrow a reference to the NFT minter")
 
         var count = 0
+        self.audioEssences = []
         self.royalties = []
 
         for key in royaltyDictionary.keys {
@@ -61,11 +64,24 @@ transaction(
             )
           )
         }
+
+        for key in audioEssenceDictionary.keys {
+          let nestedDictionary = audioEssenceDictionary[key] ?? [0.0, 0.0, 0.0]
+          let startTime = nestedDictionary[0] as? UFix64
+          let endTime = nestedDictionary[1] as? UFix64
+          let fullEpisodeDuration = nestedDictionary[2] as? UFix64
+
+          self.audioEssences.append(
+            Mindtrix.AudioEssence(
+                startTime: startTime,
+                endTime: endTime,
+                fullEpisodeDuration: fullEpisodeDuration,
+            )
+          )
+        }
     }
 
     execute {
-        log("recipient")
-        log(recipient)
         // Borrow the recipient's public NFT collection reference
         let receiver = getAccount(recipient)
             .getCapability(Mindtrix.CollectionPublicPath)
@@ -75,6 +91,9 @@ transaction(
         let len = UInt64(ipfsCid.length);
         var i: UInt64 = 0
         while i < len {
+
+            let metadata = metadata[i] as {String: AnyStruct}
+            let audioEssence = self.audioEssences[i]
 
             // Mint the NFT and deposit it to the recipient's collection
             self.minter.batchMintNFT(
@@ -98,7 +117,8 @@ transaction(
                 fourthSerial: fourthSerial,
                 fifthSerial: fifthSerial[i],
                 editionQuantity: editionQuantity[i],
-                extraMetadata: extraMetadata[i]
+                audioEssence: audioEssence,
+                metadata: metadata
             )
             i = i + UInt64(1)
         }
