@@ -75,23 +75,6 @@ pub contract Mindtrix: NonFungibleToken {
     pub let AdminAddress: Address
 
  // ========================================================
- //                           ENUM
- // ========================================================
-
-    pub enum FirstSerial: UInt8 {
-        pub case voice
-    }
-
-    pub enum VoiceSerial: UInt8 {
-        // audio = 0 + 1 = 1 in Serial, 0 is a reserved number
-        pub case audio
-        // image = 1 + 1 = 2 in Serial
-        pub case image
-        // quest = 2 + 1 = 3 in Serial
-        pub case quest
-    }
-
- // ========================================================
  //               COMPOSITE TYPES: STRUCTURE
  // ========================================================
 
@@ -354,9 +337,9 @@ pub contract Mindtrix: NonFungibleToken {
         pub fun deposit(token: @NonFungibleToken.NFT)
         pub fun getIDs(): [UInt64]
         pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
-        pub fun borrowMindtrix(id: UInt64): &Mindtrix.NFT? {
+        pub fun borrowMindtrix(id: UInt64): &Mindtrix.NFT {
             post {
-                (result == nil) || (result?.id == id):
+                (result == nil) || (result.id == id):
                     "Cannot borrow Mindtrix reference: the ID of the returned reference is incorrect"
             }
         }
@@ -407,7 +390,7 @@ pub contract Mindtrix: NonFungibleToken {
             return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
         }
 
-        pub fun borrowMindtrix(id: UInt64): &Mindtrix.NFT? {
+        pub fun borrowMindtrix(id: UInt64): &Mindtrix.NFT {
             let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
             return ref as! &Mindtrix.NFT
         }
