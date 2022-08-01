@@ -132,6 +132,7 @@ pub contract Mindtrix: NonFungibleToken {
  // ========================================================
 
     pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+        // format in uuid for a better mapping with off-chain data
         pub let id: UInt64
 
         pub let name: String
@@ -161,7 +162,6 @@ pub contract Mindtrix: NonFungibleToken {
         pub let licenseIdentifier: String
 
         init(
-            id: UInt64,
             name: String,
             description: String,
             thumbnail: String,
@@ -184,7 +184,7 @@ pub contract Mindtrix: NonFungibleToken {
             editionQuantity: UInt64,
             metadata: {String: AnyStruct}
         ) {
-            self.id = id
+            self.id = self.uuid
             self.name = name
             self.description = description
             self.thumbnail = thumbnail
@@ -448,7 +448,6 @@ pub contract Mindtrix: NonFungibleToken {
 
             // create a new NFT
             var newNFT <- create NFT(
-                id: Mindtrix.totalSupply,
                 name: name,
                 description: description,
                 thumbnail: thumbnail,
