@@ -34,18 +34,7 @@ import {
 
     console.log({ setupNftCollectionResult });
 
-    const extraMetadatas = [
-      {
-        audioEssenceStartTime: '0',
-        audioEssenceEndTime: '5',
-        audioEssenceOriginalTime: '1140',
-      },
-      {
-        audioEssenceStartTime: '5',
-        audioEssenceEndTime: '10',
-        audioEssenceOriginalTime: '1140',
-      },
-    ];
+    const extraMetadatas = [];
 
     const argObj = {
       recipientAddress,
@@ -88,6 +77,7 @@ import {
       fifthSerials: [1, 2],
       // the edition quantity corresponds to the first and second segments of an episode.
       editionQuantities: [10, 15],
+      audioEssence: [{key: "nft1", value: [0.0, 5.0, 1140.0]}, {key: "nft2", value: [0.0, 10.0, 1140.0]}],
       extraMetadatas,
     };
 

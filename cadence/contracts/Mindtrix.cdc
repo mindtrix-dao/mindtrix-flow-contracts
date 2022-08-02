@@ -38,9 +38,9 @@ https://www.mindtrix.xyz
 
 */
 
-import FungibleToken from 0xf233dcee88fe0abe
-import NonFungibleToken from 0x1d7e57aa55817448
-import MetadataViews from 0x1d7e57aa55817448
+import FungibleToken from 0x9a0766d93b6608b7
+import NonFungibleToken from 0x631e88ae7f1d7c20
+import MetadataViews from 0x631e88ae7f1d7c20
 
 pub contract Mindtrix: NonFungibleToken {
 
@@ -75,23 +75,6 @@ pub contract Mindtrix: NonFungibleToken {
     pub let AdminAddress: Address
 
  // ========================================================
- //                           ENUM
- // ========================================================
-
-    pub enum FirstSerial: UInt8 {
-        pub case voice
-    }
-
-    pub enum VoiceSerial: UInt8 {
-        // audio = 0 + 1 = 1 in Serial, 0 is a reserved number
-        pub case audio
-        // image = 1 + 1 = 2 in Serial
-        pub case image
-        // quest = 2 + 1 = 3 in Serial
-        pub case quest
-    }
-
- // ========================================================
  //               COMPOSITE TYPES: STRUCTURE
  // ========================================================
 
@@ -103,6 +86,7 @@ pub contract Mindtrix: NonFungibleToken {
         }
     }
 
+    // SerialGenus aims to breakdown an NFT's genus
     pub struct SerialGenus  {
         // number 1 here is defined as the top tier
         pub let tier: UInt8
@@ -118,22 +102,23 @@ pub contract Mindtrix: NonFungibleToken {
         }
     }
 
-    // AudioEssence struct is optional and only exists when an NFT is a VoiceSerial.audio.
+    // AudioEssence is optional and only exists when an NFT is a VoiceSerial.audio.
     pub struct AudioEssence  {
-        // e.g. startTime = 96 = 00:01:36
-        pub let startTime: UInt16?
-        // e.g. endTime = 365 = 00:06:05
-        pub let endTime: UInt16?
-        // e.g. originalDuration = 1864 = 00:31:04
-        pub let originalDuration: UInt16?
+        // The UFix64 type is to support the time in milliseconds, e.g. startTime = 96.0 = 00:01:36
+        pub let startTime: UFix64?
+        // The UFix64 type is to support the time in milliseconds, e.g. endTime = 365.0 = 00:06:05
+        pub let endTime: UFix64?
+        // The UFix64 type is to support the time in milliseconds, e.g. fullEpisodeDuration = 1864.0 = 00:31:04
+        pub let fullEpisodeDuration: UFix64?
 
-        init(startTime: UInt16?, endTime: UInt16?, originalDuration: UInt16?) {
+        init(startTime: UFix64?, endTime: UFix64?, fullEpisodeDuration: UFix64?) {
             self.startTime = startTime
             self.endTime = endTime
-            self.originalDuration = originalDuration
+            self.fullEpisodeDuration = fullEpisodeDuration
         }
     }
 
+    // SerialString represents a searching purpose to discern the NFTs genus.
     pub struct SerialString {
         pub let str: String
 
@@ -142,30 +127,12 @@ pub contract Mindtrix: NonFungibleToken {
         }
     }
 
-    pub struct Display {
-        pub let name: String
-        pub let description: String
-        pub let thumbnail: AnyStruct{MetadataViews.File}
-        pub let createdDateTime: UFix64
-
-        init(
-            name: String,
-            description: String,
-            thumbnail: AnyStruct{MetadataViews.File},
-            createdDateTime: UFix64
-        ) {
-            self.name = name
-            self.description = description
-            self.thumbnail = thumbnail
-            self.createdDateTime = createdDateTime
-        }
-    }
-
  // ========================================================
  //               COMPOSITE TYPES: RESOURCE
  // ========================================================
 
     pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+        // format in uuid for a better mapping with off-chain data
         pub let id: UInt64
 
         pub let name: String
@@ -174,7 +141,7 @@ pub contract Mindtrix: NonFungibleToken {
         pub let ipfsCid: String
         pub let ipfsDirectory: String
         access(self) let royalties: [MetadataViews.Royalty]
-        access(account) var extraMetadata: {String: AnyStruct}
+        access(self) let metadata: {String: AnyStruct}
 
         pub let collectionName: String
         pub let collectionDescription: String
@@ -193,11 +160,8 @@ pub contract Mindtrix: NonFungibleToken {
         pub let editionQuantity: UInt64
 
         pub let licenseIdentifier: String
-        pub let createdDateTime: UFix64
-
 
         init(
-            id: UInt64,
             name: String,
             description: String,
             thumbnail: String,
@@ -218,9 +182,9 @@ pub contract Mindtrix: NonFungibleToken {
             fifthSerial: UInt16,
             editionNumber: UInt64,
             editionQuantity: UInt64,
-            extraMetadata: {String: AnyStruct}
+            metadata: {String: AnyStruct}
         ) {
-            self.id = id
+            self.id = self.uuid
             self.name = name
             self.description = description
             self.thumbnail = thumbnail
@@ -241,20 +205,7 @@ pub contract Mindtrix: NonFungibleToken {
             self.fifthSerial = fifthSerial
             self.editionNumber = editionNumber
             self.editionQuantity = editionQuantity
-            self.extraMetadata = extraMetadata
-            self.createdDateTime = getCurrentBlock().timestamp
-        }
-
-        pub fun updateMetadata(newExtraMetadata: {String: AnyStruct}) {
-            for key in newExtraMetadata.keys {
-                if !self.extraMetadata.containsKey(key) {
-                    self.extraMetadata[key] = newExtraMetadata[key]
-                }
-            }
-        }
-
-        pub fun getExtraMetadata(): {String: AnyStruct} {
-            return self.extraMetadata
+            self.metadata = metadata
         }
 
         pub fun getViews(): [Type] {
@@ -267,10 +218,9 @@ pub contract Mindtrix: NonFungibleToken {
                 Type<MetadataViews.License>(),
                 Type<MetadataViews.NFTCollectionData>(),
                 Type<MetadataViews.NFTCollectionDisplay>(),
-                Type<Mindtrix.Display>(),
+                Type<MetadataViews.Traits>(),
                 Type<Mindtrix.SerialString>(),
-                Type<Mindtrix.SerialGenuses>(),
-                Type<Mindtrix.AudioEssence>()
+                Type<Mindtrix.SerialGenuses>()
             ]
         }
 
@@ -295,15 +245,6 @@ pub contract Mindtrix: NonFungibleToken {
                         thumbnail: MetadataViews.HTTPFile(
                             url: self.thumbnail
                         )
-                    )
-                case Type<Mindtrix.Display>():
-                    return Mindtrix.Display(
-                        name: self.name,
-                        description: self.description,
-                        thumbnail: MetadataViews.HTTPFile(
-                            url: self.thumbnail
-                        ),
-                        createdDateTime: self.createdDateTime
                     )
                 case Type<MetadataViews.ExternalURL>():
                     // the URL will be replaced with a gallery link in the future.
@@ -330,10 +271,7 @@ pub contract Mindtrix: NonFungibleToken {
                     let genusList: [Mindtrix.SerialGenus] = [first, second, third, fourth, fifth, sixth]
                     return genusList
                 case Type<Mindtrix.AudioEssence>():
-                    let audioEssenceStartTime = self.extraMetadata["audioEssenceStartTime"] as? UInt16
-                    let audioEssenceEndTime = self.extraMetadata["audioEssenceEndTime"] as? UInt16
-                    let audioEssenceOriginalTime = self.extraMetadata["audioEssenceOriginalTime"] as? UInt16
-                    return Mindtrix.AudioEssence(startTime: audioEssenceStartTime, endTime: audioEssenceEndTime, originalTime: audioEssenceOriginalTime)
+                    return self.metadata["audioEssence"] ?? Mindtrix.AudioEssence(startTime: 0.0, endTime: 0.0, fullEpisodeDuration: 0.0)
                 case Type<MetadataViews.Royalties>():
                     return MetadataViews.Royalties(
                         self.royalties
@@ -353,9 +291,7 @@ pub contract Mindtrix: NonFungibleToken {
                         publicCollection: Type<&Mindtrix.Collection{Mindtrix.MindtrixCollectionPublic}>(),
                         publicLinkedType: Type<&Mindtrix.Collection{Mindtrix.MindtrixCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
                         providerLinkedType: Type<&Mindtrix.Collection{Mindtrix.MindtrixCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
-                        createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
-                            return <-Mindtrix.createEmptyCollection()
-                        })
+                        createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {return <-Mindtrix.createEmptyCollection()})
                     )
                 case Type<MetadataViews.NFTCollectionDisplay>():
                     let media = MetadataViews.Media(
@@ -375,6 +311,23 @@ pub contract Mindtrix: NonFungibleToken {
                         bannerImage: media,
                         socials: socials
                     )
+                case Type<MetadataViews.Traits>():
+                    // exclude the following fields to show other uses of Traits
+                    let excludedTraits = ["mintedTime", "mintedBlock", "minter", "audioEssenceStartTime", "audioEssenceEndTime", "fullEpisodeDuration"]
+                    let traitsView = MetadataViews.dictToTraits(dict: self.metadata, excludedNames: excludedTraits)
+
+                    // mintedTime is a unix timestamp, we mark it with a Date displayType so platforms know how to show it.
+                    let mintedTimeTrait = MetadataViews.Trait(name: "mintedTime", value: self.metadata["mintedTime"]!, displayType: "Date", rarity: nil)
+                    let audioEssenceStartTimeTrait = MetadataViews.Trait(name: "audioEssenceStartTime", value: self.metadata["audioEssenceStartTime"] ?? 0.0, displayType: "Time", rarity: nil)
+                    let audioEssenceEndTimeTrait = MetadataViews.Trait(name: "audioEssenceEndTime", value: self.metadata["audioEssenceEndTime"]?? 0.0, displayType: "Time", rarity: nil)
+                    let fullEpisodeDurationTrait = MetadataViews.Trait(name: "fullEpisodeDuration", value: self.metadata["fullEpisodeDuration"]?? 0.0, displayType: "Time", rarity: nil)
+
+                    traitsView.addTrait(mintedTimeTrait)
+                    traitsView.addTrait(audioEssenceStartTimeTrait)
+                    traitsView.addTrait(audioEssenceEndTimeTrait)
+                    traitsView.addTrait(fullEpisodeDurationTrait)
+
+                    return traitsView
             }
             return nil
         }
@@ -384,9 +337,9 @@ pub contract Mindtrix: NonFungibleToken {
         pub fun deposit(token: @NonFungibleToken.NFT)
         pub fun getIDs(): [UInt64]
         pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
-        pub fun borrowMindtrix(id: UInt64): &Mindtrix.NFT? {
+        pub fun borrowMindtrix(id: UInt64): &Mindtrix.NFT {
             post {
-                (result == nil) || (result?.id == id):
+                (result == nil) || (result.id == id):
                     "Cannot borrow Mindtrix reference: the ID of the returned reference is incorrect"
             }
         }
@@ -437,7 +390,7 @@ pub contract Mindtrix: NonFungibleToken {
             return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
         }
 
-        pub fun borrowMindtrix(id: UInt64): &Mindtrix.NFT? {
+        pub fun borrowMindtrix(id: UInt64): &Mindtrix.NFT {
             let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
             return ref as! &Mindtrix.NFT
         }
@@ -482,13 +435,19 @@ pub contract Mindtrix: NonFungibleToken {
             fifthSerial: UInt16,
             editionNumber: UInt64,
             editionQuantity: UInt64,
-            extraMetadata: {String: AnyStruct}
+            audioEssence: AudioEssence,
+            metadata: {String: AnyStruct}
         ) {
-            log("id:")
-            log(Mindtrix.totalSupply)
+            let currentBlock = getCurrentBlock()
+            // general metadata that every NFT would include
+            metadata["mintedBlock"] = currentBlock.height
+            metadata["mintedTime"] = currentBlock.timestamp
+            metadata["minter"] = recipient.owner!.address
+            // only exist in audioEssence
+            metadata["audioEssence"] = audioEssence
+
             // create a new NFT
             var newNFT <- create NFT(
-                id: Mindtrix.totalSupply,
                 name: name,
                 description: description,
                 thumbnail: thumbnail,
@@ -509,7 +468,7 @@ pub contract Mindtrix: NonFungibleToken {
                 fifthSerial: fifthSerial,
                 editionNumber: editionNumber,
                 editionQuantity: editionQuantity,
-                extraMetadata: extraMetadata
+                metadata: metadata
             )
 
             // deposit it in the recipient's account using their reference
@@ -539,11 +498,13 @@ pub contract Mindtrix: NonFungibleToken {
             fourthSerial: UInt32,
             fifthSerial: UInt16,
             editionQuantity: UInt64,
-            extraMetadata: {String: AnyStruct}
+            audioEssence: AudioEssence,
+            metadata: {String: AnyStruct}
             ) {
 
             var i: UInt64 = 0
             while i < editionQuantity {
+                // we'll put most params into structs to cut down the numbers of params in the next stage
                 self.mintNFT(
                     recipient: recipient,
                     name: name,
@@ -566,7 +527,8 @@ pub contract Mindtrix: NonFungibleToken {
                     fifthSerial: fifthSerial,
                     editionNumber: UInt64(i),
                     editionQuantity: editionQuantity,
-                    extraMetadata: extraMetadata
+                    audioEssence: audioEssence,
+                    metadata: metadata
                 )
                 i = i + UInt64(1)
             }

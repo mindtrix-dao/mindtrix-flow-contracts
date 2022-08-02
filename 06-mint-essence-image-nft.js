@@ -58,6 +58,7 @@ import {
       fifthSerials: 1,
       // the edition quantity corresponds to the first and second segments of an episode.
       editionQuantities: 15,
+      audioEssence: [[0.0, 0.0, 0.0]],
       extraMetadatas,
     };
 

@@ -27,19 +27,22 @@ transaction {
 
         //==== setup FLOW vault
         // Return early if FungibleToken Vault already exist
-        if signer.borrow<&FungibleToken.Vault>(from: /storage/flowTokenVault) == nil {
+
+        if signer.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault) == nil {
             let flowToken <- FlowToken.createEmptyVault()
             signer.save(<-flowToken, to: /storage/flowTokenVault)
 
-            // Create a public capability to the Vault that only exposes
-            // the deposit function through the Receiver interface
-            let capability = signer.link<&{FungibleToken.Receiver, FungibleToken.Balance}>(
-                MetadataViews.getRoyaltyReceiverPublicPath(),
+            signer.link<&FlowToken.Vault{FungibleToken.Receiver}>(
+                /public/flowTokenReceiver,
                 target: /storage/flowTokenVault
-            )!
+            )
 
-            // Make sure the capability is valid
-            if !capability.check() { panic("Beneficiary capability is not valid!") }
+            // Create a public capability to the stored Vault that only exposes
+            // the `balance` field through the `Balance` interface
+            signer.link<&FlowToken.Vault{FungibleToken.Balance}>(
+                /public/flowTokenBalance,
+                target: /storage/flowTokenVault
+            )
 
             log("Init Flow Vault successful.")
         } else {
