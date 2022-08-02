@@ -1,5 +1,5 @@
-import MetadataViews from 0x1d7e57aa55817448
-import Mindtrix from 0xf8d6e0586b0a20c7
+import MetadataViews from 0x631e88ae7f1d7c20
+import Mindtrix from 0xb719296f75147461
 
 pub struct NFT {
     pub let name: String

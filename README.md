@@ -6,9 +6,9 @@ We're building a one-stop minting tool to bring the podcast ecosystem into the w
 ## Contract
 The contracts aim to build a minting tool for podcasters to mint their podcast NFTs with ease. The graph provides a basic explanation of the usage scenario and hopes it helps when reviewing the code. 🙂
 
-|Network|Address|
-|-------|-------|
-|testnet|[0xc5fdca10cd1aada3](https://flow-view-source.com/testnet/account/0xc5fdca10cd1aada3/contract/Mindtrix)|
+|Network|Address|NFT Catalog|
+|-------|-------|-------|
+|testnet|[0xa7bec6e2413c7d36](https://flow-view-source.com/testnet/account/0xa7bec6e2413c7d36/contract/Mindtrix)|[23](https://nft-catalog.vercel.app/proposals/testnet/23)|
 
 ![mindtrix_contract_architecture](https://i.imgur.com/o8dnuR9.png)
 
