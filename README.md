@@ -3,6 +3,14 @@ Mindtrix is a podcast DAO on Flow. 🎙
 A community derives from podcasters, listeners, and collectors.
 We're building a one-stop minting tool to bring the podcast ecosystem into the web3 world!
 
+## Live Project
+A podcast RSS feed link and an invite code is prerequisite. Please contact us to have a demo if you are a podcaster.  
+https://alpha-app.mindtrix.xyz/ready
+
+
+## Demo Video
+https://youtu.be/4jP7c6nNrOs
+
 ## Contract
 The contracts aim to build a minting tool for podcasters to mint their podcast NFTs with ease. The graph provides a basic explanation of the usage scenario and hopes it helps when reviewing the code. 🙂
 
@@ -36,9 +44,6 @@ node run 01
 ```
 and Node will run the script for you.
 If argument you provided will not hit any files, tool will give you a handy list of available examples.
-
-## Demo Video
-https://youtu.be/4jP7c6nNrOs
 
 
 ## Community Campaigns 🎉
