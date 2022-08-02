@@ -8,7 +8,7 @@ The contracts aim to build a minting tool for podcasters to mint their podcast N
 
 |Network|Address|NFT Catalog|
 |-------|-------|-------|
-|testnet|[0xd7220a1216d9d4b9](https://flow-view-source.com/testnet/account/0xd7220a1216d9d4b9/contract/Mindtrix)|[23](https://nft-catalog.vercel.app/proposals/testnet/23)|
+|testnet|[0xa7bec6e2413c7d36](https://flow-view-source.com/testnet/account/0xa7bec6e2413c7d36/contract/Mindtrix)|[23](https://nft-catalog.vercel.app/proposals/testnet/23)|
 
 ![mindtrix_contract_architecture](https://i.imgur.com/o8dnuR9.png)
 
